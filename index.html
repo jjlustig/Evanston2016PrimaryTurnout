@@ -1,0 +1,100 @@
+<html>
+    <head>
+				<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+				<script src="http://d3js.org/topojson.v1.min.js"></script>
+				<script src="js/colorbrewer.js"></script>
+        <style>
+        			body{ 
+        				background-color: #181818;
+        			}
+					path {
+						/*fill: #e5e5e5;*/
+						stroke: #fff;
+						stroke-linejoin: round;
+						stroke-linecap: round;
+					}
+
+					.title{ 
+						color:#fff;
+						text-align: center;
+					}
+					.tooltip{
+						position: absolute;
+						max-width:350px;
+						height:auto;
+						padding: 5px;
+						background-color: #606060;
+						pointer-events:none;
+						font-family: sans-serif;
+						font-size: 12px;
+						color:#fff;
+					}
+
+        </style>
+    </head>
+    <body>
+				<h1 class="title">Evanston Presidential Primary Turnout 2016</h1>
+				<p class="title"> <i> Created by Joshua Lustig and Asia Sageman </i></p>
+				<p class="title"> <i> Data provided by the City of Evanston </i></p>
+
+				<script>
+					var width = 1200,
+				    	height = 600;
+
+					var path = d3.geo.path()
+					    .projection(null);
+
+					var svg = d3.select("body").append("svg")
+					    .attr("width", width)
+					    .attr("height", height);
+
+					var barTooltip = d3.select("body").append("div")
+						.attr("class","tooltip")
+						.style("opacity",0)
+						.style("width",200);
+
+					var color = d3.scale.quantize()
+						.domain([39.92,68.11])//max and min rates from data
+						.range(colorbrewer.Blues[9]);
+
+					d3.json("build/topo-evanston.json", function(error, data) {
+					  if (error) return console.error(error);
+
+					  svg.append("g")//this is a grouping element
+					  	  .attr("class","precincts")
+					  	  .selectAll("path")
+					      .data(topojson.feature(data,data.objects.evanston).features)
+					      .enter().append("path")
+					      .attr("class","precinct")
+					      .attr("transform", "translate(170,-70)")
+					      .attr("d", path)
+					      .attr("fill",function(d){
+					      		return color(100 * d.properties.BallotsCast/d.properties.RegisteredVoters);})
+					      .on("mouseover",function(d) { 
+					      		var divId = d.id; 
+					      		var str = d.properties.precinct;
+					      		barTooltip.transition()
+					      			.duration(500)
+					      			.style("opacity",.7); 
+					      		var tip = "<h3> Ward: " + str.charAt(0) + "\nPrecinct: " + str.charAt(1) + "</h3>"; 
+					      		var tip = tip + "<strong> Registered Voters: </strong>" + d.properties.RegisteredVoters + "<br/>"; 
+					      		var tip = tip + "<strong> Ballots Cast: </strong>" + d.properties.BallotsCast + "<br/>"; 
+					      		var tip = tip + "<strong> Voter Turnout: </strong>" + Math.round(100* d.properties.BallotsCast/d.properties.RegisteredVoters) + "%<br/>"; 
+
+					      		barTooltip.html(tip)
+					      			.style("left",(d3.event.pageX)+"px")
+					      			.style("top",(d3.event.pageY)+"px");
+					      })
+					      .on("mouseout",function(d) {
+					      		barTooltip.transition()
+					      			.duration(500)
+					      			.style("opacity",0); 
+					      });
+					});
+				</script>
+		</body>
+</html>
+
+
+    </body>
+</html>
