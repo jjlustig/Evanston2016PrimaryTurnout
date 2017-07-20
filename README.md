@@ -1,8 +1,9 @@
 # Evanston2016PrimaryTurnout
-## Data Available at https://data.cityofevanston.org/ 
+Data Available at https://data.cityofevanston.org/ 
+
+Visualization Available at https://jjlustig.github.io/Evanston2016PrimaryTurnouts/
 
 # Sample commands to parse through data #
-
 ```bash 
 
 #Converts Shp files to GeoJson
